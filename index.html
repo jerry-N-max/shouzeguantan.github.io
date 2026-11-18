@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>414宿舍守则怪谈</title>
+<style>
+  :root{
+    --bg:#0E1216; --panel:#171D22; --panel-2:#1F262C; --line:#2C343B;
+    --text:#E6E2D8; --muted:#8A9299; --paper:#C9B88F; --danger:#B23A3A;
+    --teal:#7FA3A8; --ok:#6E9B78;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#07090B;color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65;-webkit-tap-highlight-color:transparent}
+  .phone{max-width:430px;min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  header{padding:14px 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .top-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .time-label{font-family:"Songti SC","Noto Serif SC",serif;font-size:15px;letter-spacing:.12em}
+  .stat{display:flex;gap:12px;font-size:13px;color:var(--muted)}
+  .stat b{color:var(--text);font-weight:600}
+  .sanity-bar{height:6px;background:var(--panel-2);border-radius:3px;overflow:hidden}
+  .sanity-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .3s}
+  .sanity-fill.low{background:var(--danger)}
+  .trust-row{display:flex;gap:10px;font-size:12px;color:var(--muted)}
+  .trust-row span b{color:var(--paper)}
+  .sound-btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--paper);flex:none}
+  .sound-btn svg{width:20px;height:20px}
+  .sound-btn.muted{color:var(--muted)}
+  .sound-btn .icon-muted{display:none}
+  .sound-btn.muted .icon-muted{display:block}
+  .sound-btn.muted .icon-on{display:none}
+  main{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+  .scene-tag{font-size:12px;color:var(--muted);letter-spacing:.18em}
+  .scene-title{font-family:"Songti SC","Noto Serif SC",serif;font-size:22px;font-weight:700}
+  .scene-text{font-size:15px}
+  .clue-inline{background:var(--panel);border-left:2px solid var(--paper);padding:10px 12px;font-size:14px;color:var(--paper);border-radius:0 8px 8px 0}
+  .clue-inline .tag{display:block;font-size:11px;color:var(--muted);margin-bottom:2px;letter-spacing:.12em}
+  button{font-family:inherit;cursor:pointer}
+  .drawer-btn{align-self:flex-start;background:var(--panel);color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px}
+  .drawer{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:none;flex-direction:column;gap:10px}
+  .drawer.open{display:flex}
+  .drawer h3{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.1em}
+  .card{background:var(--panel-2);border-radius:8px;padding:10px;font-size:14px}
+  .card .meta{font-size:12px;color:var(--paper);margin-bottom:3px}
+  .card.empty{color:var(--muted)}
+  .clue-item{border-left:2px solid var(--paper);padding-left:10px}
+  .clue-item .cid{color:var(--paper);font-size:12px;letter-spacing:.1em}
+  .clue-locked{color:var(--muted)}
+  footer{padding:12px 16px 18px;border-top:1px solid var(--line)}
+  .timer-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .timer-bar{flex:1;height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden}
+  .timer-fill{height:100%;background:var(--teal);transition:width .1s linear}
+  .timer-fill.urgent{background:var(--danger)}
+  .timer-num{font-size:13px;color:var(--muted);min-width:48px;text-align:right}
+  .calm{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:13px 14px;font-size:15px;text-align:left;min-height:48px}
+  .opt:active{background:var(--panel-2)}
+  .opt:disabled{opacity:.5;cursor:default}
+  .opt .hint{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+  #redFlash{position:fixed;inset:0;background:var(--danger);opacity:0;pointer-events:none;z-index:40}
+  #redFlash.on{animation:redflash .55s ease-out}
+  @keyframes redflash{0%{opacity:.24}60%{opacity:.12}100%{opacity:0}}
+  .overlay{position:fixed;inset:0;background:rgba(7,9,11,.88);display:none;align-items:center;justify-content:center;padding:24px;z-index:30}
+  .overlay.show{display:flex}
+  .card-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:380px;width:100%;padding:20px;display:flex;flex-direction:column;gap:14px}
+  .card-box .src{font-size:12px;color:var(--muted);letter-spacing:.12em}
+  .card-box h3{font-family:"Songti SC",serif;font-size:18px}
+  .card-box p{font-size:14px}
+  .effect{font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+  .effect b{color:var(--text)}
+  .primary{background:var(--teal);color:#061214;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600}
+  .ghost{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px}
+  .ending{display:flex;flex-direction:column;gap:14px}
+  .ending h2{font-family:"Songti SC",serif;font-size:24px}
+  .summary{font-size:14px;color:var(--muted)}
+  .log{display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .log-item{background:var(--panel);border-radius:8px;padding:10px}
+  .log-item .t{color:var(--paper);font-size:12px}
+  .rules{display:flex;flex-direction:column;gap:8px}
+  .rule{background:var(--panel);border-radius:8px;padding:10px 12px;font-size:14px}
+  .rule .no{color:var(--muted);font-size:12px;margin-right:6px}
+  @media (min-width:768px){body{padding:24px 0}.phone{min-height:auto;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6)}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <div class="top-row">
+      <span class="time-label" id="sceneLabel">414 宿舍</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="stat">
+          <span>理智 <b id="sanityNum">100</b></span>
+          <span>线索 <b id="clueNum">0</b></span>
+          <span>同化 <b id="assimNum">0</b></span>
+        </div>
+        <button class="sound-btn" id="soundBtn" role="switch" aria-checked="true" aria-label="声音开关">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="sanity-bar"><div class="sanity-fill" id="sanityFill" style="width:100%"></div></div>
+    <div class="trust-row">
+      <span>甲 <b id="trustJia">0</b></span><span>乙 <b id="trustYi">0</b></span><span>丙 <b id="trustBing">0</b></span>
+    </div>
+  </header>
+  <main id="main"></main>
+  <footer id="footer"></footer>
+</div>
+
+<!-- 突发干扰弹窗 -->
+<div class="overlay" id="popup">
+  <div class="card-box">
+    <div class="src" id="popSrc"></div>
+    <h3 id="popTitle"></h3>
+    <p id="popText"></p>
+    <div class="effect" id="popEffect"></div>
+    <button class="primary" id="popFake"></button>
+    <button class="ghost" id="popClose">忽略，先不处理</button>
+  </div>
+</div>
+
+<div id="redFlash" aria-hidden="true"></div>
+
+<!-- 选择结果反馈 -->
+<div class="overlay" id="feedback">
+  <div class="card-box">
+    <h3 id="fbTitle">结果</h3>
+    <p id="fbText"></p>
+    <div class="effect" id="fbEffect"></div>
+    <button class="primary" id="fbNext">继续</button>
+  </div>
+</div>
+
+<script>
+const RULESET_ID = "dorm-414-v0.4";
+
+const CLUES = {
+  C1:"门外声音一句接一句没有停顿，像背好的台词；它喊的是你只有家里人才用的小名。",
+  C2:"镜中人没有影子，站位和你错开半寸；写着‘回头对视’的第七条纸张比其余条目白。",
+  C3:"上铺真甲睡熟后呼吸很重；问话的声音少了他惯常的口癖，下铺方向那个不是他。",
+  C4:"415 床位空了，行李却没拿走；斜对面那盏灯亮了一整夜，屋里没人走动。",
+  C5:"床头牌正反各一个名字，正面是本人，背面写着一个你没见过的陌生名字。",
+  C6:"门外那个用了丙的全名，真舍友之间只叫外号；影子站位比门线多出半寸。",
+  C7:"对照纸张新旧、笔迹与事件印证，被补贴上去的伪条目已逐条标出，剩下的规则才可信。",
+  C8:"丙交出的最后几页笔记，画着一条绕开锁死楼道的通道；前任出门前牌子已经翻到背面。",
+  C9:"真宿管的登记本写满旧记录；假的那本是空白，脚步、肩章和手电光也对不上。"
+};
+
+const CONFIG = {
+  initialSanity: 100,
+  sanityCap: 100,
+  assimilateCap: 3,
+  sms: {
+    night1: "【宿管】规则一：熄灯之后，不要回应任何叫你名字的声音。",
+    night2: "【宿管】规则二：夜间巡查，广播念到你床位号时，把床头牌子翻过去。",
+    night3: "【宿管】规则三：清晨五点半，跟着穿制服的人走出宿舍楼，不要回头。"
+  },
+  events: [
+    /* ===== 夜一 · 守住房门 ===== */
+    { id:"1-1", night:1, time:"23:30", title:"入住 414", limited:false,
+      scene:"新学期，你住进上一任住客失踪的 414。门后贴着守则，抽屉里有前任残缺的半本笔记。第一条宿管短信已经到了。",
+      clueInline:{tag:"旧纸条", text:"念名字的都不是人，别信门上后贴的新纸条。"},
+      options:[
+        {id:"A", text:"通读守则，把含糊处记下", hint:"", result:{}, feedback:"你把每条规则重读一遍，为后面核对留出对照。"}
+      ]},
+    { id:"1-2", night:1, time:"00:20", title:"门外呼唤", limited:true, limit:12, urgentAt:4,
+      scene:"走廊灯闪了三下。门外传来班主任的声音，喊出你的名字，像是要你开门。下铺的甲坐起身，嘴张开就要应声。",
+      clueInline:{tag:"守则第一条", text:"“名字”二字墨水发晕，笔迹和其余条目对不上；门外声音一句接一句，没有停顿。"},
+      options:[
+        {id:"A", text:"应声，并把门拉开", hint:"", result:{sanity:-15, assimilate:1}, feedback:"门开一条缝，走廊空无一人。它知道这间宿舍有人醒着，门缝底下被塞进来一张湿纸条。"},
+        {id:"B", text:"屏住呼吸，不应声也不开门", hint:"", correct:"C1", result:{sanity:3}, feedback:"声音喊了三遍没得到回应，脚步声慢慢远了。你记下了它喊名字的破绽。"},
+        {id:"C", text:"先翻回守则核对字迹", hint:"", result:{sanity:1, flag:"checkedRule"}, feedback:"第一条“名字”二字笔迹发晕，你先把它标为存疑，没敢应声。"},
+        {id:"D", text:"拦住甲，叫醒乙一起判断", hint:"", result:{sanity:2, trustYi:1, flag:"jiaStopped"}, feedback:"你按住甲的肩膀。乙摇头示意别出声，指了指门板——门外的声音没有停顿。"}
+      ],
+      defaultOption:"A", defaultNote:"时间耗尽，你被甲带着应了声、拉开了门。"},
+    { id:"1-3", night:1, time:"01:10", title:"卫生间的门", limited:false,
+      scene:"厕所灯管滋滋响。镜子里，你身后站着一个人，嘴型在念你的名字。第七条写着：若镜中有人唤你，回头与他对视，他便不会纠缠。",
+      clueInline:{tag:"镜面观察", text:"他没有影子，贴在你身后错开半寸；第七条纸张比其余条目白。"},
+      options:[
+        {id:"A", text:"回头与他对视", hint:"", result:{sanity:-8, assimilate:1, flag:"mirrorEyes"}, feedback:"对视一瞬，你看清他的脸——和你一模一样。离开后后颈一直发凉。"},
+        {id:"B", text:"移开视线，低头离开卫生间", hint:"", correct:"C2", result:{sanity:3}, feedback:"你数着地砖走出来，没有回头。灯管在你身后灭了。镜中人和第七条的破绽被你记进线索本。"},
+        {id:"C", text:"只对比第七条笔迹", hint:"", result:{flag:"fakeRuleMarked"}, feedback:"第七条墨水更新、纸张更白。你记下这条守则是后来才贴上去的。"}
+      ]},
+    { id:"1-4", night:1, time:"02:30", title:"床栏外的声音", limited:true, limit:12, urgentAt:4,
+      scene:"床栏被敲响。上铺的甲本人已经翻身睡熟，下铺方向却传来甲的语气，问你“醒着吗”，还想把门边的东西递进来。",
+      clueInline:{tag:"声音对照", text:"真甲睡熟后呼吸很重；问话的语气少了他惯常的口癖。"},
+      popup:{source:"宿管通知", title:"身份核查", text:"夜间听到呼唤，请应声确认身份，便于夜间核查。", fakeLabel:"确认应声", closeLabel:"先不处理",
+        mislead:{sanity:-5, assimilate:1, flag:"misled"}},
+      options:[
+        {id:"A", text:"回话问是谁", hint:"", result:{sanity:-10, assimilate:1}, feedback:"你刚开口，那声音就学你应了一句。上铺真甲翻了个身，并没醒。"},
+        {id:"B", text:"装作睡着，不出声", hint:"", result:{sanity:2}, feedback:"敲击持续了一会儿，停了。那声音没等到第二句回话。"},
+        {id:"C", text:"对照本人状态，确认不是他", hint:"", correct:"C3", result:{clue:1}, feedback:"你借着夜灯看清上铺：甲确实睡熟。下铺方向那个不是他。这个破绽成了你的线索。"}
+      ],
+      defaultOption:"A", defaultNote:"时间耗尽，你迷迷糊糊回了话。"},
+    /* ===== 夜二 · 识破门外伪装与登记 ===== */
+    { id:"2-1", night:2, time:"傍晚", title:"别楼的反应", limited:false,
+      scene:"第二夜傍晚，宿管短信送达。走廊里别楼住户反应反常：有人门口堆着行李，有床位已经空了。",
+      clueInline:{tag:"对面楼", text:"斜对面那盏灯亮了一整夜；415 今早床位空了，行李都没拿走。"},
+      options:[
+        {id:"A", text:"仔细观察别楼的状态", hint:"", correct:"C4", result:{clue:1}, feedback:"你记下哪间黑着、哪间亮着、哪间门口堆着行李。这些旁证让你看清失踪是怎么发生的。"},
+        {id:"B", text:"回宿舍不理外面", hint:"", result:{}, feedback:"你关上宿舍门。外面的动静和这间屋无关似的。"}
+      ]},
+    { id:"2-2", night:2, time:"入夜", title:"床头挂牌", limited:false,
+      scene:"巡查前检查各自床头挂牌。丙的牌子背面写着一个陌生名字；抽屉里还留着前任的旧牌子。",
+      clueInline:{tag:"挂牌", text:"牌子正反两面各一个名字：正面是本人，背面是另一个人。"},
+      options:[
+        {id:"A", text:"翻看丙的牌子背面", hint:"", correct:"C5", result:{trustBing:1}, feedback:"背面的陌生名字你没见过。丙站在一旁没解释，只看了你一眼。正反面各一名的破绽被记下。"},
+        {id:"B", text:"查看前任旧牌子", hint:"", result:{flag:"oldPlate"}, feedback:"旧牌子背面的名字，和笔记里的失踪记录对得上。"}
+      ]},
+    { id:"2-3", night:2, time:"01:00", title:"广播念号", limited:true, limit:12, urgentAt:4,
+      scene:"广播开始念号，停顿节奏和门外敲门声一致。414 被念到。乙紧张着想把牌子翻过去。",
+      clueInline:{tag:"广播", text:"念号的间隔一长一短，和昨夜门外敲门的节奏相同。"},
+      popup:{source:"夜间巡查系统", title:"登记确认", text:"请翻牌完成本次夜间床位登记，未登记者将被标记。", fakeLabel:"点击翻牌登记", closeLabel:"先不处理",
+        mislead:{sanity:-5, assimilate:1, flag:"misled"}},
+      options:[
+        {id:"A", text:"把牌子翻过去", hint:"", result:{sanity:-10, assimilate:1, flag:"plateWrong"}, feedback:"牌子翻到背面。你忽然发觉，背面那个名字正在变得像你自己的。"},
+        {id:"B", text:"按住牌子不动", hint:"", req:{clue:"C5"}, result:{flag:"plateRight"}, feedback:"广播念完一遍，没有第二遍。牌子正面还是你的名字。"},
+        {id:"C", text:"先看一眼背面再决定", hint:"", result:{flag:"plateInspect"}, feedback:"背面那个名字你认得出不是自己。你把牌子扣回正面，没有翻。"}
+      ],
+      defaultOption:"A", defaultNote:"时间耗尽，乙慌乱中替你把牌子翻了过去。"},
+    { id:"2-4", night:2, time:"02:40", title:"门外的“丙”", limited:true, limit:12, urgentAt:4,
+      scene:"门外“丙”喊忘带钥匙，要把一件东西从门缝递进来。丙本人就在宿舍里，站在你身后。",
+      clueInline:{tag:"破绽", text:"门外称呼用的是丙的全名，真舍友之间只叫外号；门外影子站位比门线多出半寸。"},
+      options:[
+        {id:"A", text:"开门", hint:"", result:{sanity:-15, assimilate:1, flag:"openedDoor"}, feedback:"门开一条缝，走廊里没有人。你听见自己的名字被记在了本子上。"},
+        {id:"B", text:"接过门缝递来的东西", hint:"", result:{sanity:-8, assimilate:1}, feedback:"东西到手是张湿纸条，上面写着你的名字。"},
+        {id:"C", text:"对照称呼、声音和影子，识破他", hint:"", req:{clue:"C3"}, correct:"C6", result:{trustBing:1}, feedback:"真丙就站在屋里。门外那个用了全名、影子多站半寸。你没有应声，也没有接东西。"},
+        {id:"D", text:"不理会，退回床上", hint:"", result:{sanity:2}, feedback:"门外敲了一会儿，脚步声沿走廊远去。"}
+      ],
+      defaultOption:"A", defaultNote:"时间耗尽，你下意识拉开了门。"},
+    /* ===== 夜三 · 走出撤离门 ===== */
+    { id:"3-1", night:3, time:"04:10", title:"剔除伪规则", limited:false,
+      scene:"最后一夜。汇总前两夜证据，逐条核对墙上守则，挑出事后贴上去的伪条目。",
+      clueInline:{tag:"核对依据", text:"纸张新旧、笔迹差异、事件是否印证；早先标记存疑的条目在这里对上了。"},
+      options:[
+        {id:"A", text:"逐条核对，剔除伪条目", hint:"", req:{clue:"C2"}, correct:"C7", result:{}, feedback:"被印证为假的条目被你标出。剩下的规则，才可以照着判断。"},
+        {id:"B", text:"不动守则，照旧采信", hint:"", result:{}, feedback:"你没再分辨条目真伪，把墙上写的都当成规矩。"}
+      ]},
+    { id:"3-2", night:3, time:"04:30", title:"丙摊牌", limited:false,
+      scene:"丙终于开口：前任那晚跟着“宿管”下了楼，再没回来；楼里的老周，似乎有两个。他把藏起的最后几页笔记递给你。",
+      clueInline:{tag:"丙的证词", text:"他说前任出门前，床头牌子已经翻到了背面。"},
+      popup:{source:"舍友消息", title:"提醒", text:"丙最近行为反常，他给的东西不要接，小心被顶替。", fakeLabel:"相信这条提醒", closeLabel:"先不处理",
+        mislead:{sanity:-5, flag:"misled"}},
+      options:[
+        {id:"A", text:"相信他，追问细节并接过笔记", hint:"", correct:"C8", result:{trustBing:2}, feedback:"丙把最后几页笔记交给你，上面画着一条绕过封锁的通道。"},
+        {id:"B", text:"保留存疑，不接笔记", hint:"", result:{}, feedback:"丙把笔记收了回去。这条绕过封锁的线索你没能拿到。"}
+      ]},
+    { id:"3-3", night:3, time:"05:10", title:"真假宿管", limited:false,
+      scene:"楼道里出现两个穿制服的“宿管”，一个在楼梯口，一个在走廊尽头。",
+      clueInline:{tag:"物证", text:"真宿管的登记本写满旧记录；假的那本是空白。脚步声、肩章和手电光也对不上。"},
+      options:[
+        {id:"A", text:"对照登记本、脚步和肩章", hint:"", req:{clue:"C7"}, correct:"C9", result:{}, feedback:"写满旧记录的那个是真的。空白本子那本，沿墙根退进了暗处。"},
+        {id:"B", text:"凭直觉先跟一个走", hint:"", result:{sanity:-5}, feedback:"你选的那个，手电光一直没照到脸上。"}
+      ]},
+    { id:"3-4", night:3, time:"05:25", title:"撤离门", limited:true, tight:true,
+      scene:"撤离窗口开启，楼道开始封锁。能走哪扇门，取决于你此前留下的线索；线索不足的路线走不通。",
+      clueInline:{tag:"可选路线", text:"主楼梯、阳台水房通道、结伴离开，三条路各需要对应的证据。"},
+      popup:{source:"楼道广播", title:"撤离提示", text:"五分钟内跟穿制服的人离开，不要回头，不要停留。", fakeLabel:"立刻跟制服走", closeLabel:"先不处理",
+        mislead:{sanity:-5, assimilate:1, flag:"misled"}},
+      options:[
+        {id:"R1", text:"跟真宿管走主楼梯", hint:"", req:{clues:["C1","C5"]}, result:{route:"R1"}, feedback:"你跟着写满记录的登记本走上主楼梯。身后的门在晨光里合上。"},
+        {id:"R2", text:"经阳台、水房通道自行离开", hint:"", req:{clues:["C8"]}, result:{route:"R2"}, feedback:"你按丙给的笔记绕过封锁，从水房通道出了楼。"},
+        {id:"R3", text:"带上尚能行动的舍友撤离", hint:"", req:{clues:["C3","C6"]}, result:{route:"R3"}, feedback:"你拦住的甲、识破伪装后信任的丙跟在身后，你们一起走出楼门。"}
+      ],
+      defaultOption:"R1", defaultNote:"时间耗尽，你被人流带着走向楼梯口。"
+    }
+  ]
+};
+
+const SOUND_MAP = {
+  "1-2":"knock",
+  "1-3":"tube,drip",
+  "1-4":"wood",
+  "2-1":"step,door",
+  "2-2":"paper",
+  "2-3":"radio",
+  "2-4":"knock,door",
+  "3-1":"paper",
+  "3-3":"step,keys",
+  "3-4":"door"
+};
+
+const state = {
+  idx:0, sanity:CONFIG.initialSanity, assimilate:0,
+  trust:{jia:0, yi:0, bing:0}, clues:{}, flags:{},
+  sms:[CONFIG.sms.night1], log:[], timer:null, chosen:false, route:null, popupDone:false
+};
+
+const $ = id => document.getElementById(id);
+const clamp = v => Math.max(0, Math.min(CONFIG.sanityCap, v));
+
+/* ===== 音频引擎：原生 Web Audio 合成，无外部音频文件 ===== */
+const AudioEngine = {
+  ctx:null, master:null, bgmNodes:[], muted:false, started:false, lastAlarmSec:-1,
+  reduced: !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches),
+  init(){
+    if(this.ctx || this.reduced) return;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = this.muted ? 0 : 1.0;
+      this.master.connect(this.ctx.destination);
+    }catch(e){ this.ctx = null; this.master = null; }
+  },
+  resume(){ if(this.ctx && this.ctx.state === "suspended") this.ctx.resume(); },
+  ensure(){
+    this.init(); this.resume();
+    if(this.ctx && !this.started){ this.started = true; this.startBgm(); }
+  },
+  setMuted(m){
+    this.muted = m;
+    try{ localStorage.setItem("dorm414-muted", m ? "1" : "0"); }catch(e){}
+    this.syncButton();
+    if(this.master && this.ctx){
+      const t = this.ctx.currentTime;
+      this.master.gain.cancelScheduledValues(t);
+      this.master.gain.setValueAtTime(this.master.gain.value, t);
+      this.master.gain.linearRampToValueAtTime(m ? 0 : 1.0, t + 0.05);
+    }
+  },
+  loadPref(){ try{ this.muted = localStorage.getItem("dorm414-muted") === "1"; }catch(e){} },
+  syncButton(){
+    const b = $("soundBtn"); if(!b) return;
+    b.classList.toggle("muted", this.muted);
+    b.setAttribute("aria-checked", String(!this.muted));
+  },
+  makeNoise(sec){
+    const ctx = this.ctx, buf = ctx.createBuffer(1, ctx.sampleRate * sec, ctx.sampleRate);
+    const d = buf.getChannelData(0); let last = 0;
+    for(let i=0;i<d.length;i++){ const white = Math.random()*2-1; last = (last + 0.02*white)/1.02; d[i] = last*3.5; }
+    return buf;
+  },
+  startBgm(){
+    if(!this.ctx) return;
+    const ctx = this.ctx;
+    if(!this.noiseBuf) this.noiseBuf = this.makeNoise(2);
+    const nsrc = ctx.createBufferSource(); nsrc.buffer = this.noiseBuf; nsrc.loop = true;
+    const nlow = ctx.createBiquadFilter(); nlow.type = "lowpass"; nlow.frequency.value = 360;
+    const ng = ctx.createGain(); ng.gain.value = 0.27;
+    nsrc.connect(nlow); nlow.connect(ng); ng.connect(this.master); nsrc.start();
+    const o1 = ctx.createOscillator(); o1.type = "sine"; o1.frequency.value = 55;
+    const o2 = ctx.createOscillator(); o2.type = "sine"; o2.frequency.value = 58.3;
+    const o3 = ctx.createOscillator(); o3.type = "sine"; o3.frequency.value = 110;
+    const og = ctx.createGain(); og.gain.value = 0.13;
+    o1.connect(og); o2.connect(og); o3.connect(og); og.connect(this.master);
+    o1.start(); o2.start(); o3.start();
+    this.bgmNodes = [nsrc, o1, o2, o3];
+  },
+  tone(freq, dur, type, vol, when, slideTo){
+    if(!this.ctx || this.muted) return;
+    const ctx = this.ctx, t = ctx.currentTime + (when||0);
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine"; o.frequency.setValueAtTime(freq, t);
+    if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t+dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol||0.25, t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t+dur+0.05);
+  },
+  click(){ this.tone(240, 0.06, "triangle", 0.18); },
+  good(){ this.tone(392, 0.12, "sine", 0.22); this.tone(523, 0.18, "sine", 0.22, 0.1); },
+  bad(){ this.tone(110, 0.35, "sine", 0.3, 0, 55); this.tone(82, 0.3, "sawtooth", 0.1, 0, 50); },
+  assimilation(){
+    if(!this.ctx || this.muted) return;
+    this.tone(60, 0.4, "sine", 0.3, 0, 32);
+    this.noiseBurst(0.25, 120, "lowpass", 0.2, 0, 1);
+    this.tone(52, 0.16, "sine", 0.26, 0.12, 40);
+    this.tone(52, 0.16, "sine", 0.24, 0.32, 40);
+  },
+  popup(){ this.tone(180, 0.07, "square", 0.12); this.tone(150, 0.09, "square", 0.12, 0.08); },
+  alarm(){ this.tone(1200, 0.05, "square", 0.1); },
+  ending(escape){
+    if(escape){ this.tone(330,0.25,"sine",0.22); this.tone(440,0.25,"sine",0.22,0.15); this.tone(660,0.4,"sine",0.24,0.3); }
+    else{ this.tone(160,0.5,"sine",0.25,0,70); this.tone(110,0.6,"sine",0.2,0.15,55); }
+  },
+  noiseBurst(dur, freq, filterType, vol, when, Q){
+    if(!this.ctx || this.muted) return;
+    const ctx = this.ctx, t = ctx.currentTime + (when||0);
+    if(!this.noiseBuf) this.noiseBuf = this.makeNoise(2);
+    const src = ctx.createBufferSource(); src.buffer = this.noiseBuf; src.loop = true;
+    const f = ctx.createBiquadFilter(); f.type = filterType||"bandpass"; f.frequency.value = freq; f.Q.value = Q||1;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    src.connect(f); f.connect(g); g.connect(this.master);
+    src.start(t); src.stop(t+dur+0.05);
+  },
+  ambient(name){
+    if(!this.ctx || this.muted) return;
+    switch(name){
+      case "knock": this.tone(95,0.12,"sine",0.28,0,70); this.tone(95,0.12,"sine",0.28,0.25,70); break;
+      case "tube": this.noiseBurst(2.4,5200,"bandpass",0.07,0,9); break;
+      case "drip": this.tone(900,0.08,"sine",0.08,0,420); this.tone(700,0.07,"sine",0.06,0.35,360); break;
+      case "step": this.noiseBurst(0.12,220,"lowpass",0.1,0,1); this.noiseBurst(0.12,200,"lowpass",0.09,0.4,1); break;
+      case "radio": this.tone(180,2,"square",0.07); this.noiseBurst(2,1200,"bandpass",0.05,0,2); break;
+      case "paper": this.noiseBurst(0.35,3000,"bandpass",0.07,0,1.5); break;
+      case "keys": this.tone(2200,0.06,"square",0.05); this.tone(1800,0.05,"square",0.04,0.08); break;
+      case "wood": this.tone(70,0.18,"sine",0.2,0,50); break;
+      case "door": this.tone(70,0.4,"sine",0.28,0,45); this.noiseBurst(0.3,300,"lowpass",0.08,0.05); break;
+      case "water": this.noiseBurst(1.6,1800,"bandpass",0.05,0,1); break;
+    }
+  }
+};
+AudioEngine.loadPref();
+
+function flashRed(){
+  const el = $("redFlash"); if(!el) return;
+  el.classList.remove("on");
+  void el.offsetWidth;
+  el.classList.add("on");
+}
+const clueCount = () => Object.keys(state.clues).length;
+
+function hasClue(id){ return !!state.clues[id]; }
+
+function lockInfo(o){
+  if(o.req && o.req.clue){ return hasClue(o.req.clue) ? {ok:true} : {ok:false, miss:"缺少前置线索 "+o.req.clue}; }
+  if(o.req && o.req.clues){
+    const miss = o.req.clues.filter(c=>!hasClue(c));
+    return miss.length? {ok:false, miss:"缺少前置线索 "+miss.join("、")} : {ok:true};
+  }
+  return {ok:true};
+}
+
+function renderStats(){
+  $("sanityNum").textContent = state.sanity;
+  $("clueNum").textContent = clueCount();
+  $("assimNum").textContent = state.assimilate;
+  $("assimNum").style.color = state.assimilate>0 ? "var(--danger)" : "var(--text)";
+  $("trustJia").textContent = state.trust.jia;
+  $("trustYi").textContent = state.trust.yi;
+  $("trustBing").textContent = state.trust.bing;
+  const fill = $("sanityFill");
+  fill.style.width = state.sanity + "%";
+  fill.classList.toggle("low", state.sanity < 30);
+}
+
+function cluesHtml(){
+  const ids = Object.keys(CLUES);
+  return ids.map(c=>{
+    if(hasClue(c)) return `<div class="card clue-item"><div class="cid">${c}</div>${CLUES[c]}</div>`;
+    return `<div class="card clue-locked"><div class="cid">${c}</div>线索尚未获得，保持未知。</div>`;
+  }).join("");
+}
+
+function renderIntro(){
+  state.idx = 0; state.popupDone = false;
+  $("sceneLabel").textContent = "入住 414";
+  $("footer").innerHTML = "";
+  $("main").innerHTML = `
+    <h2 class="scene-title">414宿舍守则怪谈</h2>
+    <p class="scene-text">新学期，你住进上一任住客失踪的 414。连续三夜，围绕一扇扇门求生：守住房门、识破门外伪装、走出撤离门。</p>
+    <div class="rules">
+      <div class="rule"><span class="no">夜一</span>守住房门：熄灯后，不要回应任何叫你名字的声音。</div>
+      <div class="rule"><span class="no">夜二</span>识破伪装：广播念号时，先分清牌子该不该翻。</div>
+      <div class="rule"><span class="no">夜三</span>走出撤离门：清晨五点半，辨认真正能带你的人。</div>
+    </div>
+    <p class="summary">注意，逃生过程中可以翻看短信；只有在选项判断正确时才会解锁线索；在特殊情况可能会出现倒计时</p>`;
+  $("footer").innerHTML = `<button class="primary" id="startBtn">入住，开始第一夜</button>`;
+  AudioEngine.syncButton();
+  $("startBtn").addEventListener("click", ()=>{ AudioEngine.ensure(); AudioEngine.click(); renderEvent(); });
+}
+
+function renderEvent(){
+  const ev = CONFIG.events[state.idx];
+  state.chosen = false; state.popupDone = false;
+  if(ev.night === 2 && !state.flags.night2Sms){ state.sms.push(CONFIG.sms.night2); state.flags.night2Sms=1; }
+  if(ev.night === 3 && !state.flags.night3Sms){ state.sms.push(CONFIG.sms.night3); state.flags.night3Sms=1; }
+  $("sceneLabel").textContent = `第${["","一","二","三"][ev.night]}夜 · ${ev.time} ${ev.title}`;
+  renderStats();
+
+  $("main").innerHTML = `
+    <div class="scene-tag">节点 ${ev.id}</div>
+    <h2 class="scene-title">${ev.title}</h2>
+    <p class="scene-text">${ev.scene}</p>
+    <div class="clue-inline"><span class="tag">${ev.clueInline.tag}</span>${ev.clueInline.text}</div>
+    <button class="drawer-btn" id="drawerBtn">短信与线索本（${state.sms.length + clueCount()}）</button>
+    <div class="drawer" id="drawer">
+      <h3>宿管短信</h3>
+      ${state.sms.map(s=>`<div class="card"><div class="meta">短信</div>${s}</div>`).join("")}
+      <h3>证据链</h3>
+      ${cluesHtml()}
+    </div>`;
+  $("drawerBtn").addEventListener("click", () => $("drawer").classList.toggle("open"));
+
+  const optsHtml = ev.options.map(o=>{
+    const l = lockInfo(o);
+    const hint = l.ok ? o.hint : l.miss;
+    return `<button class="opt" data-id="${o.id}" ${l.ok?"":"disabled"}>
+      ${o.text}${hint?`<span class="hint">${hint}</span>`:""}</button>`;
+  }).join("");
+
+  if(ev.limited){
+    $("footer").innerHTML = `
+      <div class="timer-row">
+        <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+        <span class="timer-num" id="timerNum">${calcLimit(ev)}s</span>
+      </div>
+      <div class="options">${optsHtml}</div>`;
+    startTimer(ev);
+  }else{
+    $("footer").innerHTML = `<div class="calm">此局面可从容选择，无倒计时。</div><div class="options">${optsHtml}</div>`;
+  }
+
+  ev.options.forEach(o=>{
+    const btn = document.querySelector(`.opt[data-id="${o.id}"]`);
+    if(btn && !btn.disabled) btn.addEventListener("click", ()=>{ AudioEngine.click(); choose(o, ev); });
+  });
+
+  const snd = SOUND_MAP[ev.id];
+  if(snd) snd.split(",").forEach(s=>AudioEngine.ambient(s.trim()));
+  if(ev.popup) showPopup(ev.popup, ev);
+}
+
+function showPopup(pop, ev){
+  state.popupDone = false;
+  AudioEngine.popup();
+  $("popSrc").textContent = pop.source;
+  $("popTitle").textContent = pop.title;
+  $("popText").textContent = pop.text;
+  $("popEffect").innerHTML = "";
+  $("popFake").textContent = pop.fakeLabel;
+  $("popClose").textContent = pop.closeLabel;
+  $("popup").classList.add("show");
+  $("popFake").onclick = ()=>{
+    if(state.popupDone) return;
+    state.popupDone = true;
+    const m = pop.mislead || {};
+    state.sanity = clamp(state.sanity + (m.sanity||0));
+    state.assimilate += m.assimilate||0;
+    if(m.flag) state.flags[m.flag] = 1;
+    if((m.assimilate||0) > 0){ AudioEngine.assimilation(); flashRed(); }
+    state.log.push({time:ev.time, scene:"干扰弹窗", choice:pop.fakeLabel, effect:`被误导 · 理智 ${m.sanity||0} · 同化 +${m.assimilate||0}`});
+    renderStats();
+    $("popEffect").innerHTML = `<span>理智 <b>${state.sanity}</b></span><span>同化 <b>${state.assimilate}</b></span>`;
+    setTimeout(()=>$("popup").classList.remove("show"), 600);
+  };
+  $("popClose").onclick = ()=>{
+    state.popupDone = true;
+    state.log.push({time:ev.time, scene:"干扰弹窗", choice:"忽略弹窗", effect:"未照弹窗指令行动"});
+    $("popup").classList.remove("show");
+  };
+}
+
+function calcLimit(ev){
+  const textLen = ev.scene.length + (ev.clueInline ? ev.clueInline.text.length : 0);
+  let sec = Math.ceil(textLen/4.5) + 4;
+  sec = Math.min(20, Math.max(8, sec));
+  if(ev.tight) sec = Math.min(sec, 7);
+  return sec;
+}
+
+function startTimer(ev){
+  clearInterval(state.timer);
+  const limit = calcLimit(ev);
+  const urgentAt = Math.ceil(limit/3);
+  state.deadline = Date.now() + limit*1000;
+  AudioEngine.lastAlarmSec = -1;
+  const fill=$("timerFill"), num=$("timerNum");
+  const tick=()=>{
+    const remain=Math.max(0, state.deadline-Date.now());
+    const sec=Math.ceil(remain/1000);
+    fill.style.width=(remain/(limit*1000)*100)+"%";
+    num.textContent=sec+"s";
+    fill.classList.toggle("urgent", sec<=urgentAt);
+    if(sec<=urgentAt && sec!==AudioEngine.lastAlarmSec){ AudioEngine.lastAlarmSec=sec; AudioEngine.alarm(); }
+    if(remain<=0){ clearInterval(state.timer); if(!state.chosen) settleDefault(ev); }
+  };
+  tick();
+  state.timer=setInterval(tick,100);
+}
+
+function applyResult(ev, o, res){
+  state.sanity = clamp(state.sanity + (res.sanity||0));
+  state.assimilate += res.assimilate||0;
+  if((res.assimilate||0) > 0) flashRed();
+  if(res.trustYi) state.trust.yi += res.trustYi;
+  if(res.trustBing) state.trust.bing += res.trustBing;
+  if(res.trustJia) state.trust.jia += res.trustJia;
+  if(res.flag) state.flags[res.flag] = 1;
+  if(res.route) state.route = res.route;
+  if(o.correct){
+    state.clues[o.correct] = CLUES[o.correct];
+    state.sms.push(`线索 ${o.correct} · ${ev.time} ${ev.title}：${CLUES[o.correct]}`);
+  }
+  state.log.push({time:ev.time, scene:ev.title, choice:o.text,
+    effect:`理智 ${res.sanity>=0?"+":""}${res.sanity||0} · 同化 +${res.assimilate||0}${o.correct?` · 获得线索 ${o.correct}`:""}`});
+}
+
+function choose(o, ev){
+  if(state.chosen) return;
+  state.chosen = true;
+  clearInterval(state.timer);
+  applyResult(ev, o, o.result);
+  if(o.correct) AudioEngine.good();
+  else if((o.result.assimilate||0) > 0) AudioEngine.assimilation();
+  else if((o.result.sanity||0) < 0) AudioEngine.bad();
+  showFeedback(ev, o.feedback, o.result, !!o.correct);
+}
+
+function settleDefault(ev){
+  state.chosen = true;
+  const o = ev.options.find(x=>x.id===ev.defaultOption);
+  state.log.push({time:ev.time, scene:ev.title, choice:"时间耗尽（默认行动）", effect:ev.defaultNote});
+  applyResult(ev, {text:o.text}, o.result);
+  showFeedback(ev, ev.defaultNote, o.result, false);
+}
+
+function showFeedback(ev, text, res, good){
+  $("fbTitle").textContent = good ? ev.title+" · 线索已记" : ev.title+" · 结果";
+  $("fbText").textContent = text;
+  $("fbEffect").innerHTML = `
+    <span>理智 <b>${state.sanity}</b></span><span>线索 <b>${clueCount()}</b></span>
+    <span>同化 <b>${state.assimilate}</b></span><span>乙信任 <b>${state.trust.yi}</b></span>`;
+  $("feedback").classList.add("show");
+  $("fbNext").onclick = ()=>{
+    $("feedback").classList.remove("show");
+    state.idx += 1;
+    if(state.idx >= CONFIG.events.length) renderEnding(); else renderEvent();
+  };
+}
+
+function judgeEnding(){
+  if(state.sanity<=0 || state.assimilate>=CONFIG.assimilateCap)
+    return {key:"assimilated", title:"成为新守则", desc:"你不再是住客。墙上多了一条新守则，笔迹和其余条目一模一样。"};
+  if(state.route){
+    const map={R1:"独自带证据走出楼门。",R2:"按丙的笔记避开封锁，独自寻路离开。",R3:"与识破伪装后的舍友结伴走出楼门。"};
+    return {key:"escape", title:"逃出宿舍", desc:map[state.route]};
+  }
+  if(clueCount()>=4 && state.assimilate>=2)
+    return {key:"stay", title:"留下接替", desc:"你看清了真相，却选择留下来，顶替那个空出来的床位。"};
+  return {key:"fog", title:"迷失", desc:"你活着待在楼里，却没找到能走出去的路。真相仍然留白。"};
+}
+
+function renderEnding(){
+  clearInterval(state.timer);
+  const e = judgeEnding();
+  AudioEngine.ending(e.key === "escape");
+  $("sceneLabel").textContent = "05:30 · 清晨";
+  renderStats();
+  const logHtml = state.log.map(l=>`
+    <div class="log-item"><div class="t">${l.time} · ${l.scene}</div>
+    <div>${l.choice}</div><div class="summary">${l.effect}</div></div>`).join("");
+  $("main").innerHTML = `
+    <div class="ending">
+      <div class="scene-tag">本局结算</div>
+      <h2>${e.title}</h2>
+      <p class="summary">${e.desc}</p>
+      <div class="effect">
+        <span>理智 <b>${state.sanity}</b></span><span>线索 <b>${clueCount()}</b></span>
+        <span>同化 <b>${state.assimilate}</b></span><span>路线 <b>${state.route||"无"}</b></span>
+      </div>
+      <div class="log">${logHtml}</div>
+    </div>`;
+  $("footer").innerHTML = `<button class="primary" id="retryBtn">重新开一夜</button>`;
+  $("retryBtn").addEventListener("click", resetAll);
+}
+
+function resetAll(){
+  state.idx=0; state.sanity=CONFIG.initialSanity; state.assimilate=0;
+  state.trust={jia:0,yi:0,bing:0}; state.clues={}; state.flags={};
+  state.sms=[CONFIG.sms.night1]; state.log=[]; state.chosen=false; state.route=null; state.popupDone=false;
+  clearInterval(state.timer); renderIntro();
+}
+
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden) clearInterval(state.timer);
+  else{ const ev=CONFIG.events[state.idx]; if(ev&&ev.limited) startTimer(ev); AudioEngine.resume(); }
+});
+
+$("soundBtn").addEventListener("click", ()=>{
+  AudioEngine.ensure();
+  AudioEngine.setMuted(!AudioEngine.muted);
+  if(!AudioEngine.muted) AudioEngine.click();
+});
+
+renderIntro();
+</script>
+</body>
+</html>
